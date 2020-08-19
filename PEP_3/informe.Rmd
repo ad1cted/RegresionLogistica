@@ -1,0 +1,807 @@
+---
+title: "Gráficos"
+author: "Grupo 2"
+date: "8/18/2020"
+output:
+  word_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Datos
+
+```{r, echo=FALSE, warning=FALSE}
+
+rm(list=ls())
+
+library("MASS")
+```
+
+### limpieza datos
+```{r}
+
+databruta <- read.csv("base_bruta_v2.csv", header = T, sep=";")
+
+databruta$NUM_CONSR_EXITOSOS_CONS = as.numeric(gsub(",",".",databruta$NUM_CONSR_EXITOSOS_CONS))
+#databruta$NUM_CONSR_EXITOSOS_CONS = as.numeric(databruta$NUM_CONSR_EXITOSOS_CONS)
+
+databruta$DIAS_DUR_POLIZA = as.numeric(gsub(",",".",databruta$DIAS_DUR_POLIZA))
+#databruta$DIAS_DUR_POLIZA = as.numeric(databruta$DIAS_DUR_POLIZA)
+
+databruta$MONTO_CONTRAGARANTIA_SOLES = as.numeric(gsub(",",".",databruta$MONTO_CONTRAGARANTIA_SOLES))
+#databruta$MONTO_CONTRAGARANTIA_SOLES = as.numeric(databruta$MONTO_CONTRAGARANTIA_SOLES)
+
+databruta$MONTO_SOLICITUD_SOLES = as.numeric(gsub(",",".",databruta$MONTO_SOLICITUD_SOLES))
+#databruta$MONTO_SOLICITUD_SOLES = as.numeric(databruta$MONTO_SOLICITUD_SOLES)
+
+#databruta$NUM_POLZ_X_CONSR = as.numeric(gsub(",","",databruta$NUM_POLZ_X_CONSR))
+databruta$NUM_POLZ_X_CONSR = as.integer(databruta$NUM_POLZ_X_CONSR)
+
+databruta$max_PARTICIPACION_TOMADOR = as.numeric(gsub(",",".",databruta$max_PARTICIPACION_TOMADOR))
+#databruta$max_PARTICIPACION_TOMADOR = as.numeric(databruta$max_PARTICIPACION_TOMADOR)
+
+databruta$sum_PARTICIPACION_TOMADOR = as.numeric(gsub(",",".",databruta$sum_PARTICIPACION_TOMADOR))
+#databruta$sum_PARTICIPACION_TOMADOR = as.numeric(databruta$sum_PARTICIPACION_TOMADOR)
+
+databruta$mean_CUM_ALC_PARTICIPANTE_SOLES = as.numeric(gsub(",",".",databruta$mean_CUM_ALC_PARTICIPANTE_SOLES))
+#databruta$mean_CUM_ALC_PARTICIPANTE_SOLES = as.numeric(databruta$mean_CUM_ALC_PARTICIPANTE_SOLES)
+
+databruta$max_ANIOS_EMPRESA = as.numeric(gsub(",",".",databruta$max_ANIOS_EMPRESA))
+#databruta$max_ANIOS_EMPRESA = as.numeric(databruta$max_ANIOS_EMPRESA)
+
+databruta$sum_cantidad_protesto = as.integer(databruta$sum_cantidad_protesto)
+
+databruta$max_monto_mora = as.numeric(gsub(",",".",databruta$max_monto_mora))
+#databruta$max_monto_mora = as.numeric(databruta$max_monto_mora)
+
+databruta$min_cantidad_mora = as.integer(databruta$min_cantidad_mora)
+databruta$sum_incidentes_judiciales = as.integer(databruta$sum_incidentes_judiciales)
+databruta$min_cantidad_incidentes = as.integer(databruta$min_cantidad_incidentes)
+databruta$sum_cantidad_incidentes = as.integer(databruta$sum_cantidad_incidentes)
+
+databruta$sum_deuda_indirecta_total_max = as.numeric(gsub(",",".",databruta$sum_deuda_indirecta_total_max))
+#databruta$sum_deuda_indirecta_total_max = as.numeric(databruta$sum_deuda_indirecta_total_max)
+
+databruta$min_cantidad_bancos = as.integer(databruta$min_cantidad_bancos)
+databruta$sum_cantidad_bancos = as.integer(databruta$sum_cantidad_bancos)
+databruta$min_incidentes_girador = as.integer(databruta$min_incidentes_girador)
+
+databruta$sum_cal_normal = as.numeric(gsub(",",".",databruta$sum_cal_normal))
+#databruta$sum_cal_normal = as.numeric(databruta$sum_cal_normal)
+
+databruta$max_cal_cpp = as.numeric(gsub(",",".",databruta$max_cal_cpp))
+#databruta$max_cal_cpp = as.numeric(databruta$max_cal_cpp)
+
+databruta$sum_cal_deficiente = as.numeric(gsub(",",".",databruta$sum_cal_deficiente))
+#databruta$sum_cal_deficiente = as.numeric(databruta$sum_cal_deficiente)
+
+databruta$max_cal_dudoso = as.numeric(gsub(",",".",databruta$max_cal_dudoso))
+#databruta$max_cal_dudoso = as.numeric(databruta$max_cal_dudoso)
+
+databruta$mean_cal_perdida = as.numeric(gsub(",",".",databruta$mean_cal_perdida))
+#databruta$mean_cal_perdida = as.numeric(databruta$mean_cal_perdida)
+
+databruta$max_cumulo_vigente = as.numeric(gsub(",",".",databruta$max_cumulo_vigente))
+#databruta$max_cumulo_vigente = as.numeric(databruta$max_cumulo_vigente)
+
+databruta$max_deuda_refinanciada = as.numeric(gsub(",",".",databruta$max_deuda_refinanciada))
+#databruta$max_deuda_refinanciada = as.numeric(databruta$max_deuda_refinanciada)
+
+databruta$min_deuda_vencida = as.numeric(gsub(",",".",databruta$min_deuda_vencida))
+#databruta$min_deuda_vencida = as.numeric(databruta$min_deuda_vencida)
+
+databruta$sum_deuda_vencida = as.numeric(gsub(",",".",databruta$sum_deuda_vencida))
+#databruta$sum_deuda_vencida = as.numeric(databruta$sum_deuda_vencida)
+
+databruta$sum_monto_mayor_exposicion = as.numeric(gsub(",",".",databruta$sum_monto_mayor_exposicion))
+#databruta$sum_monto_mayor_exposicion = as.numeric(databruta$sum_monto_mayor_exposicion)
+
+databruta$max_monto_hipoteca = as.numeric(gsub(",",".",databruta$max_monto_hipoteca))
+#databruta$max_monto_hipoteca = as.numeric(databruta$max_monto_hipoteca)
+
+databruta$max_protestos_ultimos_meses = as.numeric(gsub(",",".",databruta$max_protestos_ultimos_meses))
+#databruta$max_protestos_ultimos_meses = as.numeric(databruta$max_protestos_ultimos_meses)
+
+databruta$mean_CANT_CONSORCIOS = as.numeric(gsub(",",".",databruta$mean_CANT_CONSORCIOS))
+#databruta$mean_CANT_CONSORCIOS = as.numeric(databruta$mean_CANT_CONSORCIOS)
+
+databruta$mean_CANT_TOMADOR_SOLO = as.numeric(gsub(",",".",databruta$mean_CANT_TOMADOR_SOLO))
+#databruta$mean_CANT_TOMADOR_SOLO = as.numeric(databruta$mean_CANT_TOMADOR_SOLO)
+
+databruta$min_NUM_ALIADOS_TOTALES = as.numeric(gsub(",",".",databruta$min_NUM_ALIADOS_TOTALES))
+#databruta$min_NUM_ALIADOS_TOTALES = as.numeric(databruta$min_NUM_ALIADOS_TOTALES)
+
+databruta$max_NUMveces_ALIADO_TOM_MISMO_CONSR = as.numeric(gsub(",",".",databruta$max_NUMveces_ALIADO_TOM_MISMO_CONSR))
+#databruta$max_NUMveces_ALIADO_TOM_MISMO_CONSR = as.numeric(databruta$max_NUMveces_ALIADO_TOM_MISMO_CONSR)
+
+databruta$sum_NUM_POLZ_X_TOM = as.numeric(gsub(",",".",databruta$sum_NUM_POLZ_X_TOM))
+#databruta$sum_NUM_POLZ_X_TOM = as.integer(databruta$sum_NUM_POLZ_X_TOM)
+
+databruta$RAMO_POLIZA = as.factor(databruta$RAMO_POLIZA)
+databruta$TIPO_CLIENTE = as.factor(databruta$TIPO_CLIENTE)
+databruta$CANAL= as.factor(databruta$CANAL)
+databruta$CONTRAGARANTIA = as.factor(databruta$CONTRAGARANTIA)
+#databruta$siniestro = as.factor(databruta$siniestro)
+databruta$siniestro = as.integer(databruta$siniestro)
+```
+
+## gráficos
+```{r}
+summary(databruta$NUM_CONSR_EXITOSOS_CONS)
+table(databruta$NUM_CONSR_EXITOSOS_CONS)
+hist(databruta$NUM_CONSR_EXITOSOS_CONS, main="Histograma NUM_CONSR_EXITOSOS_CONS")
+
+summary(databruta$DIAS_DUR_POLIZA)
+table(databruta$DIAS_DUR_POLIZA)
+hist(databruta$DIAS_DUR_POLIZA, main="Histograma DIAS_DUR_POLIZA")
+
+summary(databruta$MONTO_CONTRAGARANTIA_SOLES)
+table(databruta$MONTO_CONTRAGARANTIA_SOLES)
+hist(databruta$MONTO_CONTRAGARANTIA_SOLES, main="Histograma MONTO_CONTRAGARANTIA_SOLES")
+
+summary(databruta$MONTO_SOLICITUD_SOLES)
+table(databruta$MONTO_SOLICITUD_SOLES)
+hist(databruta$MONTO_SOLICITUD_SOLES, main="Histograma MONTO_SOLICITUD_SOLES")
+
+summary(databruta$NUM_POLZ_X_CONSR)
+table(databruta$NUM_POLZ_X_CONSR)
+hist(databruta$NUM_POLZ_X_CONSR, main="Histograma NUM_POLZ_X_CONSR")
+
+summary(databruta$max_PARTICIPACION_TOMADOR)
+table(databruta$max_PARTICIPACION_TOMADOR)
+hist(databruta$max_PARTICIPACION_TOMADOR, main="Histograma max_PARTICIPACION_TOMADOR")
+
+summary(databruta$sum_PARTICIPACION_TOMADOR)
+table(databruta$sum_PARTICIPACION_TOMADOR)
+hist(databruta$sum_PARTICIPACION_TOMADOR, main="Histograma sum_PARTICIPACION_TOMADOR")
+
+summary(databruta$mean_CUM_ALC_PARTICIPANTE_SOLES)
+table(databruta$mean_CUM_ALC_PARTICIPANTE_SOLES)
+hist(databruta$mean_CUM_ALC_PARTICIPANTE_SOLES, main="Histograma mean_CUM_ALC_PARTICIPANTE_SOLES")
+
+summary(databruta$max_ANIOS_EMPRESA)
+table(databruta$max_ANIOS_EMPRESA)
+hist(databruta$max_ANIOS_EMPRESA, main="Histograma max_ANIOS_EMPRESA")
+
+summary(databruta$sum_cantidad_protesto)
+table(databruta$sum_cantidad_protesto)
+hist(databruta$sum_cantidad_protesto)
+hist(databruta$sum_cantidad_protesto, main="Histograma sum_cantidad_protesto")
+
+summary(databruta$max_monto_mora)
+table(databruta$max_monto_mora)
+hist(databruta$max_monto_mora, main="Histograma max_monto_mora")
+
+summary(databruta$min_cantidad_mora)
+table(databruta$min_cantidad_mora)
+hist(databruta$min_cantidad_mora, main="Histograma min_cantidad_mora")
+
+summary(databruta$sum_incidentes_judiciales)
+table(databruta$sum_incidentes_judiciales)
+hist(databruta$sum_incidentes_judiciales, main="Histograma sum_incidentes_judiciales")
+
+summary(databruta$min_cantidad_incidentes)
+table(databruta$min_cantidad_incidentes)
+hist(databruta$min_cantidad_incidentes, main="Histograma min_cantidad_incidentes")
+
+summary(databruta$sum_cantidad_incidentes)
+table(databruta$sum_cantidad_incidentes)
+hist(databruta$sum_cantidad_incidentes, main="Histograma sum_cantidad_incidentes")
+
+summary(databruta$sum_deuda_indirecta_total_max)
+table(databruta$sum_deuda_indirecta_total_max)
+hist(databruta$sum_deuda_indirecta_total_max, main="Histograma sum_deuda_indirecta_total_max")
+
+summary(databruta$min_cantidad_bancos)
+table(databruta$min_cantidad_bancos)
+hist(databruta$min_cantidad_bancos, main="Histograma min_cantidad_bancos")
+
+summary(databruta$sum_cantidad_bancos)
+table(databruta$sum_cantidad_bancos)
+hist(databruta$sum_cantidad_bancos, main="Histograma sum_cantidad_bancos")
+
+summary(databruta$min_incidentes_girador)
+table(databruta$min_incidentes_girador)
+hist(databruta$min_incidentes_girador, main="Histograma min_incidentes_girador")
+
+summary(databruta$sum_cal_normal)
+table(databruta$sum_cal_normal)
+hist(databruta$sum_cal_normal, main="Histograma sum_cal_normal")
+
+summary(databruta$max_cal_cpp)
+table(databruta$max_cal_cpp)
+hist(databruta$max_cal_cpp, main="Histograma max_cal_cpp")
+
+summary(databruta$sum_cal_deficiente)
+table(databruta$sum_cal_deficiente)
+hist(databruta$sum_cal_deficiente, main="Histograma sum_cal_deficiente")
+
+summary(databruta$max_cal_dudoso)
+table(databruta$max_cal_dudoso)
+hist(databruta$max_cal_dudoso, main="Histograma max_cal_dudoso")
+
+summary(databruta$mean_cal_perdida)
+table(databruta$mean_cal_perdida)
+hist(databruta$mean_cal_perdida, main="Histograma mean_cal_perdida")
+
+summary(databruta$max_cumulo_vigente)
+table(databruta$max_cumulo_vigente)
+hist(databruta$max_cumulo_vigente, main="Histograma max_cumulo_vigente")
+
+summary(databruta$max_deuda_refinanciada)
+table(databruta$max_deuda_refinanciada)
+hist(databruta$max_deuda_refinanciada, main="Histograma max_deuda_refinanciada")
+
+summary(databruta$min_deuda_vencida)
+table(databruta$min_deuda_vencida)
+hist(databruta$min_deuda_vencida, main="Histograma min_deuda_vencida")
+
+summary(databruta$sum_deuda_vencida)
+table(databruta$sum_deuda_vencida)
+hist(databruta$sum_deuda_vencida, main="Histograma sum_deuda_vencida")
+
+summary(databruta$sum_monto_mayor_exposicion)
+table(databruta$sum_monto_mayor_exposicion)
+hist(databruta$sum_monto_mayor_exposicion, main="Histograma sum_monto_mayor_exposicion")
+
+summary(databruta$max_monto_hipoteca)
+table(databruta$max_monto_hipoteca)
+hist(databruta$max_monto_hipoteca, main="Histograma max_monto_hipoteca")
+
+summary(databruta$max_protestos_ultimos_meses)
+table(databruta$max_protestos_ultimos_meses)
+hist(databruta$max_protestos_ultimos_meses, main="Histograma max_protestos_ultimos_meses")
+
+summary(databruta$mean_CANT_CONSORCIOS)
+table(databruta$mean_CANT_CONSORCIOS)
+hist(databruta$mean_CANT_CONSORCIOS, main="Histograma mean_CANT_CONSORCIOS")
+
+summary(databruta$mean_CANT_TOMADOR_SOLO)
+table(databruta$mean_CANT_TOMADOR_SOLO)
+hist(databruta$mean_CANT_TOMADOR_SOLO, main="Histograma mean_CANT_TOMADOR_SOLO")
+
+summary(databruta$min_NUM_ALIADOS_TOTALES)
+table(databruta$min_NUM_ALIADOS_TOTALES)
+hist(databruta$min_NUM_ALIADOS_TOTALES, main="Histograma min_NUM_ALIADOS_TOTALES")
+
+summary(databruta$sum_NUM_POLZ_X_TOM)
+table(databruta$sum_NUM_POLZ_X_TOM)
+hist(databruta$max_NUMveces_ALIADO_TOM_MISMO_CONSR, main="Histograma max_NUMveces_ALIADO_TOM_MISMO_CONSR")
+
+summary(databruta$sum_NUM_POLZ_X_TOM)
+hist(databruta$sum_NUM_POLZ_X_TOM, main="Histograma sum_NUM_POLZ_X_TOM")
+
+#ramo_poliza
+table(databruta$RAMO_POLIZA)
+barplot(table(databruta$RAMO_POLIZA))
+
+#tipo_cliente
+table(databruta$TIPO_CLIENTE)
+barplot(table(databruta$TIPO_CLIENTE))
+
+#canal
+table(databruta$CANAL)
+barplot(table(databruta$CANAL))
+
+#contragarantia
+table(databruta$CONTRAGARANTIA)
+barplot(table(databruta$CONTRAGARANTIA))
+
+#siniestros
+table(databruta$siniestro)
+barplot(table(databruta$siniestro))
+
+```
+
+```{r}
+library('corrplot')
+par(mar=c(1,1,1,1))
+clondatabruta <- databruta
+
+
+clondatabruta$RAMO_POLIZA <- NULL
+clondatabruta$TIPO_CLIENTE <- NULL
+clondatabruta$CANAL <- NULL
+clondatabruta$CONTRAGARANTIA <- NULL
+
+
+
+corr <- round(cor(clondatabruta),2)
+
+write.csv2(corr, file = "./matriz-correlaciones.csv")
+
+corr
+
+#pairs(corr)
+#corrplot(corr, method="number", type="upper", tl.cex = 0.6,  tl.srt=45, tl.col="black")
+#corrplot.mixed(corr,  order="hclust", tl.col="black", tl.srt=45, tl.cex = 0.6)
+
+corrplot(corr, type="upper", order="hclust", tl.col="black", tl.srt=45, tl.cex = 0.7)
+
+
+
+
+```
+De la matriz de correlación tenemos que existen variables en las que se puede ver una correlación con la variable dependiente |corr| >= -0.05
+- sum_PARTICIPACION_TOMADOR
+- NUM_POLZ_X_CONSR
++ max_ANIOS_EMPRESA
++ max_monto_hipoteca
++ min_deuda_vencida
+
+
+```{r}
+datosRelevantes <- subset(databruta, select = c(
+  "sum_PARTICIPACION_TOMADOR",
+  "NUM_POLZ_X_CONSR",
+  "max_ANIOS_EMPRESA",
+  "max_monto_hipoteca",
+  "min_deuda_vencida",
+  "min_deuda_vencida",
+  "siniestro"
+  ))
+
+corrv2 <- round(cor(datosRelevantes),2)
+
+write.csv2(corrv2, file = "./matriz-correlaciones-relevante.csv")
+
+corrv2
+
+#pairs(corrv2)
+
+corrplot(corrv2, type="upper", order="hclust", tl.col="black", tl.srt=45, tl.cex = 0.8)
+
+```
+
+```{r, echo=FALSE}
+
+datasiniestro <- databruta[which(databruta$siniestro==1),]
+
+datanosiniestro <- databruta[which(databruta$siniestro==0),]
+
+
+
+
+```
+
+
+
+## Distribución de los datos
+
+```{r}
+#install.packages("nortest")
+
+library(nortest)
+
+lillie.test(databruta[,1])
+lillie.test(datasiniestro[,1])
+lillie.test(datanosiniestro[,1])
+
+lillie.test(databruta[,2])
+lillie.test(datasiniestro[,2])
+lillie.test(datanosiniestro[,2])
+
+lillie.test(databruta[,3])
+lillie.test(datasiniestro[,3])
+lillie.test(datanosiniestro[,3])
+
+lillie.test(databruta[,4])
+lillie.test(datasiniestro[,4])
+lillie.test(datanosiniestro[,4])
+
+lillie.test(databruta[,5])
+lillie.test(datasiniestro[,5])
+lillie.test(datanosiniestro[,5])
+
+lillie.test(databruta[,6])
+lillie.test(datasiniestro[,6])
+lillie.test(datanosiniestro[,6])
+
+lillie.test(databruta[,7])
+lillie.test(datasiniestro[,7])
+lillie.test(datanosiniestro[,7])
+
+lillie.test(databruta[,8])
+lillie.test(datasiniestro[,8])
+lillie.test(datanosiniestro[,8])
+
+lillie.test(databruta[,9])
+lillie.test(datasiniestro[,9])
+lillie.test(datanosiniestro[,9])
+
+lillie.test(databruta[,10])
+lillie.test(datasiniestro[,10])
+lillie.test(datanosiniestro[,10])
+
+lillie.test(databruta[,11])
+lillie.test(datasiniestro[,11])
+lillie.test(datanosiniestro[,11])
+
+lillie.test(databruta[,12])
+lillie.test(datasiniestro[,12])
+lillie.test(datanosiniestro[,12])
+
+lillie.test(databruta[,13])
+lillie.test(datasiniestro[,13])
+lillie.test(datanosiniestro[,13])
+
+lillie.test(databruta[,14])
+lillie.test(datasiniestro[,14])
+lillie.test(datanosiniestro[,14])
+
+lillie.test(databruta[,15])
+lillie.test(datasiniestro[,15])
+lillie.test(datanosiniestro[,15])
+
+lillie.test(databruta[,16])
+lillie.test(datasiniestro[,16])
+lillie.test(datanosiniestro[,16])
+
+lillie.test(databruta[,17])
+lillie.test(datasiniestro[,17])
+lillie.test(datanosiniestro[,17])
+
+lillie.test(databruta[,18])
+lillie.test(datasiniestro[,18])
+lillie.test(datanosiniestro[,18])
+
+lillie.test(databruta[,19])
+lillie.test(datasiniestro[,19])
+lillie.test(datanosiniestro[,19])
+
+lillie.test(databruta[,20])
+lillie.test(datasiniestro[,20])
+lillie.test(datanosiniestro[,20])
+
+lillie.test(databruta[,21])
+lillie.test(datasiniestro[,21])
+lillie.test(datanosiniestro[,21])
+
+lillie.test(databruta[,22])
+lillie.test(datasiniestro[,22])
+lillie.test(datanosiniestro[,22])
+
+lillie.test(databruta[,23])
+lillie.test(datasiniestro[,23])
+lillie.test(datanosiniestro[,23])
+
+lillie.test(databruta[,24])
+lillie.test(datasiniestro[,24])
+lillie.test(datanosiniestro[,24])
+
+lillie.test(databruta[,25])
+lillie.test(datasiniestro[,25])
+lillie.test(datanosiniestro[,25])
+
+lillie.test(databruta[,26])
+lillie.test(datasiniestro[,26])
+lillie.test(datanosiniestro[,26])
+
+lillie.test(databruta[,27])
+lillie.test(datasiniestro[,27])
+lillie.test(datanosiniestro[,27])
+
+lillie.test(databruta[,28])
+lillie.test(datasiniestro[,28])
+lillie.test(datanosiniestro[,28])
+
+lillie.test(databruta[,29])
+lillie.test(datasiniestro[,29])
+lillie.test(datanosiniestro[,29])
+
+lillie.test(databruta[,30])
+lillie.test(datasiniestro[,30])
+lillie.test(datanosiniestro[,30])
+
+lillie.test(databruta[,31])
+lillie.test(datasiniestro[,31])
+lillie.test(datanosiniestro[,31])
+
+lillie.test(databruta[,32])
+lillie.test(datasiniestro[,32])
+lillie.test(datanosiniestro[,32])
+
+lillie.test(databruta[,33])
+lillie.test(datasiniestro[,33])
+lillie.test(datanosiniestro[,33])
+
+lillie.test(databruta[,34])
+lillie.test(datasiniestro[,34])
+lillie.test(datanosiniestro[,34])
+
+lillie.test(databruta[,35])
+lillie.test(datasiniestro[,35])
+lillie.test(datanosiniestro[,35])
+
+lillie.test(databruta[,36])
+lillie.test(datasiniestro[,36])
+lillie.test(datanosiniestro[,36])
+
+
+```
+
+
+## Análixsis de medias
+```{r}
+
+par(mfrow=c(2,2))
+boxplot(databruta$NUM_CONSR_EXITOSOS_CONS, datasiniestro$NUM_CONSR_EXITOSOS_CONS, datanosiniestro$NUM_CONSR_EXITOSOS_CONS ,
+        main="Comparación distribución: NUM_CONSR_EXITOSOS_CONS",
+        names=c("total","siniestro","no siniestro"),
+        horizontal = TRUE,
+        las = 3
+        )
+boxplot(databruta$DIAS_DUR_POLIZA, datasiniestro$DIAS_DUR_POLIZA, datanosiniestro$DIAS_DUR_POLIZA ,
+        main="Comparación distrución: DIAS_DUR_POLIZA",
+        names=c("total","siniestro","no siniestro"),
+        horizontal = TRUE,
+        las = 3
+        )
+boxplot(databruta$MONTO_CONTRAGARANTIA_SOLES, datasiniestro$MONTO_CONTRAGARANTIA_SOLES, datanosiniestro$MONTO_CONTRAGARANTIA_SOLES ,
+        main="Comparación distrución: MONTO_CONTRAGARANTIA_SOLES",
+        names=c("total","siniestro","no siniestro"),
+        horizontal = TRUE,
+        las = 3
+        )
+boxplot(databruta$MONTO_SOLICITUD_SOLES, datasiniestro$MONTO_SOLICITUD_SOLES, datanosiniestro$MONTO_SOLICITUD_SOLES ,
+        main="Comparación distrución: MONTO_SOLICITUD_SOLES",
+        names=c("total","siniestro","no siniestro"),
+        horizontal = TRUE,
+        las = 3
+        )
+
+boxplot(databruta$NUM_POLZ_X_CONSR, datasiniestro$NUM_POLZ_X_CONSR, datanosiniestro$NUM_POLZ_X_CONSR ,
+        main="Comparación distrución: NUM_POLZ_X_CONSR",
+        names=c("total","siniestro","no siniestro"),
+        horizontal = TRUE,
+        las = 3
+        )
+
+boxplot(databruta$max_PARTICIPACION_TOMADOR, datasiniestro$max_PARTICIPACION_TOMADOR, datanosiniestro$max_PARTICIPACION_TOMADOR ,
+        main="Comparación distrución: max_PARTICIPACION_TOMADOR",
+        names=c("total","siniestro","no siniestro"),
+        horizontal = TRUE,
+        las = 3
+        )
+
+boxplot(databruta$sum_PARTICIPACION_TOMADOR, datasiniestro$sum_PARTICIPACION_TOMADOR, datanosiniestro$sum_PARTICIPACION_TOMADOR ,
+        main="Comparación distrución: sum_PARTICIPACION_TOMADOR",
+        names=c("total","siniestro","no siniestro"),
+        horizontal = TRUE,
+        las = 3
+        )
+
+boxplot(databruta$mean_CUM_ALC_PARTICIPANTE_SOLES, datasiniestro$mean_CUM_ALC_PARTICIPANTE_SOLES, datanosiniestro$mean_CUM_ALC_PARTICIPANTE_SOLES ,
+        main="Comparación distrución: mean_CUM_ALC_PARTICIPANTE_SOLES",
+        names=c("total","siniestro","no siniestro"),
+        horizontal = TRUE,
+        las = 3
+        )
+
+
+boxplot(databruta$max_ANIOS_EMPRESA, datasiniestro$max_ANIOS_EMPRESA, datanosiniestro$max_ANIOS_EMPRESA ,
+        main="Comparación distrución: max_ANIOS_EMPRESA",
+        names=c("total","siniestro","siniestro"),
+        horizontal = TRUE,
+        las = 3
+        )
+
+
+boxplot(databruta$sum_cantidad_protesto, datasiniestro$sum_cantidad_protesto, datanosiniestro$sum_cantidad_protesto ,
+        main="Comparación distrución: sum_cantidad_protesto",
+        names=c("total","siniestro","no siniestro"),
+        horizontal = TRUE,
+        las = 3
+        )
+
+boxplot(databruta$max_monto_mora, datasiniestro$max_monto_mora, datanosiniestro$max_monto_mora ,
+        main="Comparación distrución: max_monto_mora",
+        names=c("total","siniestro","no siniestro"),
+        horizontal = TRUE,
+        las = 3
+        )
+
+
+boxplot(databruta$min_cantidad_mora, datasiniestro$min_cantidad_mora, datanosiniestro$min_cantidad_mora ,
+        main="Comparación distrución: min_cantidad_mora",
+        names=c("total","siniestro","no siniestro"),
+        horizontal = TRUE,
+        las = 3
+        )
+
+boxplot(databruta$sum_incidentes_judiciales, datasiniestro$sum_incidentes_judiciales, datanosiniestro$sum_incidentes_judiciales ,
+        main="Comparación distrución: sum_incidentes_judiciales",
+        names=c("total","siniestro","no siniestro"),
+        horizontal = TRUE,
+        las = 3
+        )
+
+boxplot(databruta$min_cantidad_incidentes, datasiniestro$min_cantidad_incidentes, datanosiniestro$sum_incidentes_judiciales ,
+        main="Comparación distrución: min_cantidad_incidentes",
+        names=c("total","siniestro","no siniestro"),
+        horizontal = TRUE,
+        las = 3
+        )
+
+
+boxplot(databruta$sum_cantidad_incidentes, datasiniestro$sum_cantidad_incidentes, datanosiniestro$sum_cantidad_incidentes ,
+        main="Comparación distrución: sum_cantidad_incidentes",
+        names=c("total","siniestro","no siniestro"),
+        horizontal = TRUE,
+        las = 3
+        )
+
+boxplot(databruta$sum_deuda_indirecta_total_max, datasiniestro$sum_deuda_indirecta_total_max, datanosiniestro$sum_deuda_indirecta_total_max ,
+        main="Comparación distrución: sum_deuda_indirecta_total_max",
+        names=c("total","siniestro","no siniestro"),
+        horizontal = TRUE,
+        las = 3
+        )
+
+boxplot(databruta$min_cantidad_bancos, datasiniestro$min_cantidad_bancos, datanosiniestro$min_cantidad_bancos ,
+        main="Comparación distrución: min_cantidad_bancos",
+        names=c("total","siniestro","no siniestro"),
+        horizontal = TRUE,
+        las = 3
+        )
+
+
+boxplot(databruta$sum_cantidad_bancos, datasiniestro$sum_cantidad_bancos, datanosiniestro$sum_cantidad_bancos ,
+        main="Comparación distrución: sum_cantidad_bancos",
+        names=c("total","siniestro","no siniestro"),
+        horizontal = TRUE,
+        las = 3
+        )
+
+boxplot(databruta$min_incidentes_girador, datasiniestro$min_incidentes_girador, datanosiniestro$min_incidentes_girador ,
+        main="Comparación distrución: min_incidentes_girador",
+        names=c("total","siniestro","no siniestro"),
+        horizontal = TRUE,
+        las = 3
+        )
+
+boxplot(databruta$sum_cal_normal, datasiniestro$sum_cal_normal, datanosiniestro$sum_cal_normal ,
+        main="Comparación distrución: sum_cal_normal",
+        names=c("total","siniestro","no siniestro"),
+        horizontal = TRUE,
+        las = 3
+        )
+
+boxplot(databruta$max_cal_cpp, datasiniestro$max_cal_cpp, datanosiniestro$max_cal_cpp ,
+        main="Comparación distrución: max_cal_cpp",
+        names=c("total","siniestro","no siniestro"),
+        horizontal = TRUE,
+        las = 3
+        )
+
+boxplot(databruta$max_cal_dudoso, datasiniestro$max_cal_dudoso, datanosiniestro$max_cal_dudoso ,
+        main="Comparación distrución: max_cal_dudoso",
+        names=c("total","siniestro","no siniestro"),
+        horizontal = TRUE,
+        las = 3
+        )
+
+boxplot(databruta$mean_cal_perdida, datasiniestro$mean_cal_perdida, datanosiniestro$mean_cal_perdida ,
+        main="Comparación distrución: mean_cal_perdida",
+        names=c("total","siniestro","no siniestro"),
+        horizontal = TRUE,
+        las = 3
+        )
+
+boxplot(databruta$max_cumulo_vigente, datasiniestro$max_cumulo_vigente, datanosiniestro$max_cumulo_vigente ,
+        main="Comparación distrución: max_cumulo_vigente",
+        names=c("total","siniestro","no siniestro"),
+        horizontal = TRUE,
+        las = 3
+        )
+
+
+boxplot(databruta$max_deuda_refinanciada, datasiniestro$max_deuda_refinanciada, datanosiniestro$max_deuda_refinanciada ,
+        main="Comparación distrución: max_deuda_refinanciada",
+        names=c("total","siniestro","no siniestro"),
+        horizontal = TRUE,
+        las = 3
+        )
+
+boxplot(databruta$min_deuda_vencida, datasiniestro$min_deuda_vencida, datanosiniestro$min_deuda_vencida ,
+        main="Comparación distrución: min_deuda_vencida",
+        names=c("total","siniestro","no siniestro"),
+        horizontal = TRUE,
+        las = 3
+        )
+
+boxplot(databruta$sum_deuda_vencida, datasiniestro$sum_deuda_vencida, datanosiniestro$sum_deuda_vencida ,
+        main="Comparación distrución: sum_deuda_vencida",
+        names=c("total","siniestro","no siniestro"),
+        horizontal = TRUE,
+        las = 3
+        )
+
+
+boxplot(databruta$sum_monto_mayor_exposicion, datasiniestro$sum_monto_mayor_exposicion, datanosiniestro$sum_monto_mayor_exposicion ,
+        main="Comparación distrución: sum_monto_mayor_exposicion",
+        names=c("total","siniestro","no siniestro"),
+        horizontal = TRUE,
+        las = 3
+        )
+
+boxplot(databruta$max_monto_hipoteca, datasiniestro$max_monto_hipoteca, datanosiniestro$max_monto_hipoteca ,
+        main="Comparación distrución: max_monto_hipoteca",
+        names=c("total","siniestro","no siniestro"),
+        horizontal = TRUE,
+        las = 3
+        )
+
+boxplot(databruta$max_protestos_ultimos_meses, datasiniestro$max_protestos_ultimos_meses, datanosiniestro$max_protestos_ultimos_meses ,
+        main="Comparación distrución: max_protestos_ultimos_meses",
+        names=c("total","siniestro","no siniestro"),
+        horizontal = TRUE,
+        las = 3
+        )
+
+boxplot(databruta$mean_CANT_CONSORCIOS, datasiniestro$mean_CANT_CONSORCIOS, datanosiniestro$mean_CANT_CONSORCIOS ,
+        main="Comparación distrución: mean_CANT_CONSORCIOS",
+        names=c("total","siniestro","no siniestro"),
+        horizontal = TRUE,
+        las = 3
+        )
+
+boxplot(databruta$mean_CANT_TOMADOR_SOLO, datasiniestro$mean_CANT_TOMADOR_SOLO, datanosiniestro$mean_CANT_TOMADOR_SOLO ,
+        main="Comparación distrución: mean_CANT_TOMADOR_SOLO",
+        names=c("total","siniestro","no siniestro"),
+        horizontal = TRUE,
+        las = 3
+        )
+
+boxplot(databruta$min_NUM_ALIADOS_TOTALES, datasiniestro$min_NUM_ALIADOS_TOTALES, datanosiniestro$min_NUM_ALIADOS_TOTALES ,
+        main="Comparación distrución: min_NUM_ALIADOS_TOTALES",
+        names=c("total","siniestro","no siniestro"),
+        horizontal = TRUE,
+        las = 3
+        )
+
+
+boxplot(databruta$max_NUMveces_ALIADO_TOM_MISMO_CONSR, datasiniestro$max_NUMveces_ALIADO_TOM_MISMO_CONSR, datanosiniestro$max_NUMveces_ALIADO_TOM_MISMO_CONSR ,
+        main="Comparación distrución: max_NUMveces_ALIADO_TOM_MISMO_CONSR",
+        names=c("total","siniestro","no siniestro"),
+        horizontal = TRUE,
+        las = 3
+        )
+
+boxplot(databruta$sum_NUM_POLZ_X_TOM, datasiniestro$sum_NUM_POLZ_X_TOM, datanosiniestro$sum_NUM_POLZ_X_TOM ,
+        main="Comparación distrución: sum_NUM_POLZ_X_TOM",
+        names=c("total","siniestro","no siniestro"),
+        horizontal = TRUE,
+        las = 3
+        )
+
+
+par(mfrow=c(1,3))
+barplot(table(databruta$TIPO_CLIENTE), main="Histograma TIPO_CLIENTE Total")
+barplot(table(datasiniestro$TIPO_CLIENTE), main="Histograma TIPO_CLIENTE Siniestro")
+barplot(table(datanosiniestro$TIPO_CLIENTE), main="Histograma TIPO_CLIENTE No siniestro")
+
+par(mfrow=c(1,3))
+barplot(table(databruta$RAMO_POLIZA), main="Histograma RAMO_POLIZA Total")
+barplot(table(datasiniestro$RAMO_POLIZA), main="Histograma RAMO_POLIZA Siniestro")
+barplot(table(datanosiniestro$RAMO_POLIZA), main="Histograma RAMO_POLIZA No siniestro")
+
+par(mfrow=c(1,3))
+barplot(table(databruta$CANAL), main="Histograma CANAL Total")
+barplot(table(datasiniestro$CANAL), main="Histograma CANAL Siniestro")
+barplot(table(datanosiniestro$CANAL), main="Histograma CANAL No siniestro")
+
+par(mfrow=c(1,3))
+barplot(table(databruta$CANAL), main="Histograma CANAL Total")
+barplot(table(datasiniestro$CANAL), main="Histograma CANAL Siniestro")
+barplot(table(datanosiniestro$CANAL), main="Histograma CANAL No siniestro")
+```
+
+## t test
+
+```{r}
+t.test(x = datos$antes, y = datos$despues, alternative = "two.sided",
+       mu = 0, paired = TRUE, conf.level = 0.95)
